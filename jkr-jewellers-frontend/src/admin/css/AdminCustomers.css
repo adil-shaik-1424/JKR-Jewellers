@@ -1,0 +1,198 @@
+.customers-container {
+
+    padding: 25px;
+
+}
+
+.customers-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+
+}
+
+.customers-header h2 {
+
+    font-size: 28px;
+
+    color: #1f2937;
+
+}
+
+/* Table */
+
+.customers-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow: 0 3px 12px rgba(0,0,0,.08);
+
+}
+
+.customers-table thead {
+
+    background: #1f2937;
+
+    color: white;
+
+}
+
+.customers-table th {
+
+    padding: 18px;
+
+    text-align: center;
+
+    font-size: 16px;
+
+}
+
+.customers-table td {
+
+    padding: 18px;
+
+    text-align: center;
+
+    border-bottom: 1px solid #ececec;
+
+    font-size: 15px;
+
+}
+
+.customers-table tbody tr:hover {
+
+    background: #fafafa;
+
+}
+
+/* Status */
+
+.status-active {
+
+    color: #16a34a;
+
+    font-weight: bold;
+
+}
+
+.status-inactive {
+
+    color: #dc2626;
+
+    font-weight: bold;
+
+}
+
+/* View Button */
+
+.view-btn {
+
+    background: #2563eb;
+
+    color: white;
+
+    border: none;
+
+    padding: 8px 18px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: .3s;
+
+}
+
+.view-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+/* Empty Row */
+
+.no-data {
+
+    text-align: center;
+
+    color: gray;
+
+    padding: 30px;
+
+    font-size: 16px;
+
+}
+
+/* Responsive */
+
+@media (max-width: 480px) {
+
+    .customers-container {
+        padding: 12px;
+    }
+
+    .customers-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .customers-header h2 {
+        font-size: 18px;
+    }
+
+    .customers-table th {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .customers-table td {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .view-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .no-data {
+        padding: 18px;
+        font-size: 13px;
+    }
+
+}
+@media (max-width: 480px) {
+
+    .table-scroll-wrap .customers-table{
+        min-width: 0;
+    }
+
+    .customers-table th:nth-child(1),
+    .customers-table td:nth-child(1),
+    .customers-table th:nth-child(3),
+    .customers-table td:nth-child(3),
+    .customers-table th:nth-child(4),
+    .customers-table td:nth-child(4) {
+        display: none;
+    }
+
+}

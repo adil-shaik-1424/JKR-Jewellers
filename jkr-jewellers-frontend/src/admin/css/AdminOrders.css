@@ -1,0 +1,131 @@
+.orders-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+.orders-header h1{
+    font-size:28px;
+    color:#1f2937;
+}
+.orders-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+}
+.orders-table th{
+    background:#1f2937;
+    color:white;
+    padding:16px;
+    text-align:center;
+}
+.orders-table td{
+    padding:18px;
+    text-align:center;
+    border-bottom:1px solid #eee;
+    vertical-align:middle;
+}
+.orders-table tr:hover{
+    background:#fafafa;
+}
+.view-order-btn{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:8px 18px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    transition:.3s;
+}
+.view-order-btn:hover{
+    background:#1d4ed8;
+}
+.status-badge{
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+    display:inline-block;
+}
+.status-pending{ background:#fef3c7; color:#92400e; }
+.status-confirmed{ background:#dbeafe; color:#1e40af; }
+.status-shipped{ background:#e0e7ff; color:#4338ca; }
+.status-delivered{ background:#dcfce7; color:#166534; }
+.status-cancelled{ background:#fee2e2; color:#991b1b; }
+.payment-badge{
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+    display:inline-block;
+}
+.payment-success{ background:#dcfce7; color:#166534; }
+.payment-pending{ background:#fef3c7; color:#92400e; }
+.payment-failed{ background:#fee2e2; color:#991b1b; }
+.no-orders{
+    text-align:center;
+    padding:40px;
+    color:#777;
+    font-size:16px;
+}
+@media (max-width: 992px) {
+    .orders-table {
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+}
+@media (max-width: 480px) {
+
+    .orders-table{
+        min-width: 0;
+    }
+
+    .orders-table th:nth-child(1),
+    .orders-table td:nth-child(1),
+    .orders-table th:nth-child(3),
+    .orders-table td:nth-child(3),
+    .orders-table th:nth-child(5),
+    .orders-table td:nth-child(5) {
+        display: none;
+    }
+
+    .orders-header{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .orders-header h1{
+        font-size: 18px;
+    }
+
+    .orders-table th,
+    .orders-table td{
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .view-order-btn{
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .status-badge,
+    .payment-badge{
+        padding: 3px 8px;
+        font-size: 10px;
+    }
+
+    .no-orders{
+        padding: 20px;
+        font-size: 13px;
+    }
+
+}

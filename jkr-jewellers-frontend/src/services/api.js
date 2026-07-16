@@ -1,0 +1,27 @@
+import axios from "axios";
+
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+});
+
+const PUBLIC_PREFIXES = ["/auth", "/products", "/categories", "/banners"];
+
+api.interceptors.request.use(
+    (config) => {
+
+        const token = localStorage.getItem("token");
+
+        const isPublic = PUBLIC_PREFIXES.some((prefix) =>
+            config.url.startsWith(prefix)
+        );
+
+        if (token && !isPublic) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+export default api;

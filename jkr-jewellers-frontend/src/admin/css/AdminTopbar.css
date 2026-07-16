@@ -1,0 +1,180 @@
+.admin-topbar{
+
+    height:70px;
+    background:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 30px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.logout-btn{
+
+    background:#dc3545;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:6px;
+    cursor:pointer;
+
+}
+
+.logout-btn:hover{
+
+    background:#bb2d3b;
+
+}
+
+.topbar-left{
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+}
+
+.sidebar-toggle-btn{
+
+    display:none;
+    background:none;
+    border:none;
+    font-size:24px;
+    cursor:pointer;
+    color:#1f2937;
+    padding:0;
+
+}
+
+@media (max-width: 900px) {
+
+    .admin-topbar{
+        padding: 0 15px;
+    }
+
+    .topbar-left{
+        flex: 1;
+        min-width: 0;
+        gap: 8px;
+    }
+
+    .admin-topbar h2{
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sidebar-toggle-btn{
+        display:block;
+        flex-shrink: 0;
+    }
+
+    .logout-btn{
+        padding: 8px 14px;
+        font-size: 14px;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+}
+.admin-topbar{
+
+    height:70px;
+    background:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 30px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.logout-btn{
+
+    background:#dc3545;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:6px;
+    cursor:pointer;
+
+}
+
+.logout-btn:hover{
+
+    background:#bb2d3b;
+
+}
+
+.topbar-left{
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+}
+
+.sidebar-toggle-btn{
+
+    display:none;
+    background:none;
+    border:none;
+    font-size:24px;
+    cursor:pointer;
+    color:#1f2937;
+    padding:0;
+
+}
+
+@media (max-width: 900px) {
+
+    .admin-topbar{
+        padding: 0 15px;
+    }
+
+    .topbar-left{
+        flex: 1;
+        min-width: 0;
+        gap: 8px;
+    }
+
+    .admin-topbar h2{
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sidebar-toggle-btn{
+        display:block;
+        flex-shrink: 0;
+    }
+
+    .logout-btn{
+        padding: 8px 14px;
+        font-size: 14px;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+}
+@media (max-width: 480px) {
+
+    .admin-topbar h2{
+        font-size: 13px;
+    }
+
+    .logout-btn{
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+}
