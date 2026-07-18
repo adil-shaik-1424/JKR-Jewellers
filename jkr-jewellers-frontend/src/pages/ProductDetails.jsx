@@ -156,7 +156,7 @@ function ProductDetails() {
                         className="main-image"
                         src={selectedImage || "/placeholder.jpg"}
                         alt={product.name}
-                        onError={(e) => (e.target.src = "/placeholder.jpg")}
+                        onError={(e) => { e.target.onerror = null; e.target.src = "/placeholder.jpg"; }}
                     />
 
                     <div className="thumbnail-container">

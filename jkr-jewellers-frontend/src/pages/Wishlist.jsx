@@ -142,9 +142,10 @@ function Wishlist() {
                                     <img
                                         src={item.imageUrls?.[0] || "/placeholder.jpg"}
                                         alt={item.productName}
-                                        onError={(e) =>
-                                            (e.target.src = "/placeholder.jpg")
-                                        }
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = "/placeholder.jpg";
+                                        }}
                                     />
 
                                     {isUnavailable && (

@@ -70,7 +70,7 @@ function BestSellerSection() {
                            <img
                                 src={product.images?.[0]?.imageUrl || "/placeholder.jpg"}
                                 alt={product.name}
-                                onError={(e) => (e.target.src = "/placeholder.jpg")}
+                                onError={(e) => { e.target.onerror = null; e.target.src = "/placeholder.jpg"; }}
                             />
 
                             <div className="best-content">
