@@ -7,6 +7,7 @@ import com.adil.jkrjewellers.repository.CategoryRepository;
 import com.adil.jkrjewellers.repository.ProductRepository;
 import com.adil.jkrjewellers.service.CategoryService;
 import com.adil.jkrjewellers.util.FileStorageService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,9 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final FileStorageService fileStorageService;
+
+    @Value("${app.base.url}")
+    private String baseUrl;
 
     public CategoryServiceImpl(
             CategoryRepository categoryRepository,
@@ -109,7 +113,7 @@ public class CategoryServiceImpl implements CategoryService {
         String fileName = fileStorageService.saveFile(file);
 
         category.setImageUrl(
-                "http://localhost:8081/images/" + fileName
+                baseUrl + "/images/" + fileName
         );
 
         return categoryRepository.save(category);

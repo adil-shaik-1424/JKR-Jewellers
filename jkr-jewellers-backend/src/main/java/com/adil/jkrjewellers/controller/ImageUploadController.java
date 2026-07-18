@@ -6,6 +6,7 @@ import com.adil.jkrjewellers.entity.ProductImage;
 import com.adil.jkrjewellers.repository.ProductImageRepository;
 import com.adil.jkrjewellers.repository.ProductRepository;
 import com.adil.jkrjewellers.util.FileStorageService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,9 @@ public class ImageUploadController {
     private final FileStorageService fileStorageService;
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
+
+    @Value("${app.base.url}")
+    private String baseUrl;
 
     public ImageUploadController(
             FileStorageService fileStorageService,
@@ -60,7 +64,7 @@ public class ImageUploadController {
                 String fileName = fileStorageService.saveFile(file);
 
                 String imageUrl =
-                        "http://localhost:8081/images/" + fileName;
+                        baseUrl + "/images/" + fileName;
 
                 ProductImage image = new ProductImage();
 
@@ -123,7 +127,7 @@ public class ImageUploadController {
             String fileName =
                     image.getImageUrl()
                             .replace(
-                                    "http://localhost:8081/images/",
+                                    baseUrl + "/images/",
                                     "");
 
             fileStorageService.deleteFile(fileName);

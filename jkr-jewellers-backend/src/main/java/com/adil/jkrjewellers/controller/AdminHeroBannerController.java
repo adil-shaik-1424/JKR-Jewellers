@@ -4,6 +4,7 @@ import com.adil.jkrjewellers.dto.response.HeroBannerResponse;
 import com.adil.jkrjewellers.entity.HeroBanner;
 import com.adil.jkrjewellers.repository.HeroBannerRepository;
 import com.adil.jkrjewellers.util.FileStorageService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,9 @@ public class AdminHeroBannerController {
 
     private final FileStorageService fileStorageService;
     private final HeroBannerRepository heroBannerRepository;
+
+    @Value("${app.base.url}")
+    private String baseUrl;
 
     public AdminHeroBannerController(
             FileStorageService fileStorageService,
@@ -47,7 +51,7 @@ public class AdminHeroBannerController {
         try {
 
             String fileName = fileStorageService.saveFile(file);
-            String imageUrl = "http://localhost:8081/images/" + fileName;
+            String imageUrl = baseUrl + "/images/" + fileName;
 
             HeroBanner banner = heroBannerRepository
                     .findByPosition(position)
@@ -56,7 +60,7 @@ public class AdminHeroBannerController {
             if (banner.getImageUrl() != null) {
 
                 String oldFileName = banner.getImageUrl()
-                        .replace("http://localhost:8081/images/", "");
+                        .replace(baseUrl + "/images/", "");
 
                 try {
                     fileStorageService.deleteFile(oldFileName);
@@ -87,7 +91,7 @@ public class AdminHeroBannerController {
         try {
 
             String fileName = banner.getImageUrl()
-                    .replace("http://localhost:8081/images/", "");
+                    .replace(baseUrl + "/images/", "");
 
             fileStorageService.deleteFile(fileName);
 
