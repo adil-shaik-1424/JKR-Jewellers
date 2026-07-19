@@ -6,7 +6,6 @@ import com.adil.jkrjewellers.entity.ProductImage;
 import com.adil.jkrjewellers.repository.ProductImageRepository;
 import com.adil.jkrjewellers.repository.ProductRepository;
 import com.adil.jkrjewellers.util.FileStorageService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,9 +23,6 @@ public class ImageUploadController {
     private final FileStorageService fileStorageService;
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
-
-    @Value("${app.base.url}")
-    private String baseUrl;
 
     public ImageUploadController(
             FileStorageService fileStorageService,
@@ -61,10 +57,8 @@ public class ImageUploadController {
 
             try {
 
-                String fileName = fileStorageService.saveFile(file);
-
-                String imageUrl =
-                        baseUrl + "/images/" + fileName;
+                // saveFile now uploads to Cloudinary and returns the full secure URL
+                String imageUrl = fileStorageService.saveFile(file);
 
                 ProductImage image = new ProductImage();
 
@@ -124,13 +118,8 @@ public class ImageUploadController {
 
         try {
 
-            String fileName =
-                    image.getImageUrl()
-                            .replace(
-                                    baseUrl + "/images/",
-                                    "");
-
-            fileStorageService.deleteFile(fileName);
+            // Cloudinary needs the full stored URL to figure out what to delete
+            fileStorageService.deleteFile(image.getImageUrl());
 
         } catch (IOException e) {
 

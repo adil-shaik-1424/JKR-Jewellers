@@ -4,7 +4,6 @@ import com.adil.jkrjewellers.dto.response.HeroBannerResponse;
 import com.adil.jkrjewellers.entity.HeroBanner;
 import com.adil.jkrjewellers.repository.HeroBannerRepository;
 import com.adil.jkrjewellers.util.FileStorageService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,9 +18,6 @@ public class AdminHeroBannerController {
 
     private final FileStorageService fileStorageService;
     private final HeroBannerRepository heroBannerRepository;
-
-    @Value("${app.base.url}")
-    private String baseUrl;
 
     public AdminHeroBannerController(
             FileStorageService fileStorageService,
@@ -50,8 +46,8 @@ public class AdminHeroBannerController {
 
         try {
 
-            String fileName = fileStorageService.saveFile(file);
-            String imageUrl = baseUrl + "/images/" + fileName;
+            // saveFile now uploads to Cloudinary and returns the full secure URL directly
+            String imageUrl = fileStorageService.saveFile(file);
 
             HeroBanner banner = heroBannerRepository
                     .findByPosition(position)
@@ -59,11 +55,8 @@ public class AdminHeroBannerController {
 
             if (banner.getImageUrl() != null) {
 
-                String oldFileName = banner.getImageUrl()
-                        .replace(baseUrl + "/images/", "");
-
                 try {
-                    fileStorageService.deleteFile(oldFileName);
+                    fileStorageService.deleteFile(banner.getImageUrl());
                 } catch (IOException ignored) {
                 }
             }
@@ -90,10 +83,7 @@ public class AdminHeroBannerController {
 
         try {
 
-            String fileName = banner.getImageUrl()
-                    .replace(baseUrl + "/images/", "");
-
-            fileStorageService.deleteFile(fileName);
+            fileStorageService.deleteFile(banner.getImageUrl());
 
         } catch (IOException e) {
 

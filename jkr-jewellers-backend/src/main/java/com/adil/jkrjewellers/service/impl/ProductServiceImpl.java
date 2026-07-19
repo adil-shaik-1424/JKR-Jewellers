@@ -2,6 +2,7 @@ package com.adil.jkrjewellers.service.impl;
 
 import com.adil.jkrjewellers.dto.request.ProductRequest;
 import com.adil.jkrjewellers.dto.response.ProductResponse;
+import com.adil.jkrjewellers.dto.response.ProductImageResponse;
 import com.adil.jkrjewellers.entity.Category;
 import com.adil.jkrjewellers.entity.Product;
 import com.adil.jkrjewellers.entity.ProductImage;
@@ -18,8 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import com.adil.jkrjewellers.dto.response.ProductImageResponse;
+
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -64,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product saved = productRepository.save(product);
 
-        return mapToResponse(saved);
+        return mapToResponse(saved, List.of());
     }
 
     @Override
@@ -90,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product updated = productRepository.save(product);
 
-        return mapToResponse(updated);
+        return getProductById(updated.getId());
     }
 
     @Override
@@ -115,51 +117,39 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Product not found with id: " + id));
 
-        return mapToResponse(product);
+        List<ProductImageResponse> images = productImageRepository
+                .findByProductIdOrderByDisplayOrderAsc(product.getId())
+                .stream()
+                .map(this::mapImage)
+                .collect(Collectors.toList());
+
+        return mapToResponse(product, images);
     }
 
     @Override
     public List<ProductResponse> getAllProducts() {
-
-        return productRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-
+        return mapToResponseList(productRepository.findAll());
     }
 
     @Override
     public List<ProductResponse> getProductsByCategory(Long categoryId) {
-
-        return productRepository.findByCategoryId(categoryId)
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-
+        return mapToResponseList(productRepository.findByCategoryId(categoryId));
     }
 
     @Override
     public List<ProductResponse> getBestSellers() {
-
-        return productRepository.findByIsBestSellerTrue()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-
+        return mapToResponseList(productRepository.findByIsBestSellerTrue());
     }
 
     @Override
     public List<ProductResponse> searchProducts(String keyword) {
-
-        return productRepository
-                .findByNameContainingIgnoreCaseOrCategory_NameContainingIgnoreCase(
-                        keyword,
-                        keyword
-                )
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-
+        return mapToResponseList(
+                productRepository
+                        .findByNameContainingIgnoreCaseOrCategory_NameContainingIgnoreCase(
+                                keyword,
+                                keyword
+                        )
+        );
     }
 
     @Override
@@ -169,20 +159,56 @@ public class ProductServiceImpl implements ProductService {
             BigDecimal minPrice,
             BigDecimal maxPrice) {
 
-        return productRepository
-                .filterProducts(
+        return mapToResponseList(
+                productRepository.filterProducts(
                         categoryId,
                         purity,
                         minPrice,
                         maxPrice
                 )
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-
+        );
     }
 
-    private ProductResponse mapToResponse(Product product) {
+    // Batches image lookups into ONE query for the whole list instead of one query per product
+    private List<ProductResponse> mapToResponseList(List<Product> products) {
+
+        if (products.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> productIds = products.stream()
+                .map(Product::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, List<ProductImageResponse>> imagesByProduct = productImageRepository
+                .findByProductIdInOrderByDisplayOrderAsc(productIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        img -> img.getProduct().getId(),
+                        Collectors.mapping(this::mapImage, Collectors.toList())
+                ));
+
+        return products.stream()
+                .map(product -> mapToResponse(
+                        product,
+                        imagesByProduct.getOrDefault(product.getId(), List.of())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private ProductImageResponse mapImage(ProductImage image) {
+
+        ProductImageResponse img = new ProductImageResponse();
+
+        img.setId(image.getId());
+        img.setImageUrl(image.getImageUrl());
+        img.setPrimary(image.isPrimary());
+        img.setDisplayOrder(image.getDisplayOrder());
+
+        return img;
+    }
+
+    private ProductResponse mapToResponse(Product product, List<ProductImageResponse> images) {
 
         ProductResponse response = new ProductResponse();
 
@@ -196,24 +222,6 @@ public class ProductServiceImpl implements ProductService {
         response.setStatus(product.getStatus().name());
         response.setBestSeller(product.isBestSeller());
         response.setCategoryName(product.getCategory().getName());
-
-        List<ProductImageResponse> images = productImageRepository
-                .findByProductIdOrderByDisplayOrderAsc(product.getId())
-                .stream()
-                .map(image -> {
-
-                    ProductImageResponse img = new ProductImageResponse();
-
-                    img.setId(image.getId());
-                    img.setImageUrl(image.getImageUrl());
-                    img.setPrimary(image.isPrimary());
-                    img.setDisplayOrder(image.getDisplayOrder());
-
-                    return img;
-
-                })
-                .collect(Collectors.toList());
-
         response.setImages(images);
 
         return response;

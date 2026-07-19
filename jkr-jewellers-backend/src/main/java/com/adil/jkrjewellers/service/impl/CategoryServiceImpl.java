@@ -7,7 +7,6 @@ import com.adil.jkrjewellers.repository.CategoryRepository;
 import com.adil.jkrjewellers.repository.ProductRepository;
 import com.adil.jkrjewellers.service.CategoryService;
 import com.adil.jkrjewellers.util.FileStorageService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,31 +20,23 @@ public class CategoryServiceImpl implements CategoryService {
     private final ProductRepository productRepository;
     private final FileStorageService fileStorageService;
 
-    @Value("${app.base.url}")
-    private String baseUrl;
-
     public CategoryServiceImpl(
             CategoryRepository categoryRepository,
             ProductRepository productRepository,
             FileStorageService fileStorageService
     ) {
-
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.fileStorageService = fileStorageService;
-
     }
 
     @Override
     public Category addCategory(Category category) {
-
         return categoryRepository.save(category);
-
     }
 
     @Override
     public Category updateCategory(Long id, Category category) {
-
         Category existing = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
@@ -57,48 +48,37 @@ public class CategoryServiceImpl implements CategoryService {
         existing.setFeatured(category.isFeatured());
 
         return categoryRepository.save(existing);
-
     }
 
     @Override
     public void deleteCategory(Long id) {
-
         if (productRepository.existsByCategoryId(id)) {
-
             throw new RuntimeException(
                     "Cannot delete category. This category contains products."
             );
-
         }
-
         categoryRepository.deleteById(id);
-
     }
 
     @Override
     public List<Category> getAllCategories() {
-
         return categoryRepository.findAll();
-
     }
+
     @Override
     public List<Category> getCategoriesByGenderAndMetalType(
             Gender gender,
             MetalType metalType
     ) {
-
         return categoryRepository.findByGenderAndMetalType(
                 gender,
                 metalType
         );
-
     }
 
     @Override
     public List<Category> getFeaturedCategories() {
-
         return categoryRepository.findByFeaturedTrue();
-
     }
 
     @Override
@@ -110,14 +90,11 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        String fileName = fileStorageService.saveFile(file);
+        // saveFile now uploads to Cloudinary and returns the full secure URL directly
+        String imageUrl = fileStorageService.saveFile(file);
 
-        category.setImageUrl(
-                baseUrl + "/images/" + fileName
-        );
+        category.setImageUrl(imageUrl);
 
         return categoryRepository.save(category);
-
     }
-
 }
