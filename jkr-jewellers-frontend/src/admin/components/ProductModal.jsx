@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import adminApi from "../services/adminApi";
 import "../css/ProductModal.css";
 
@@ -17,6 +17,9 @@ function ProductModal({
     const [previewImages, setPreviewImages] = useState([]);
 
     const [existingImages, setExistingImages] = useState([]);
+
+    const [saving, setSaving] = useState(false);
+    const savingRef = useRef(false);
 
     // ---------- Custom Popup ----------
     const [popup, setPopup] = useState({
@@ -140,6 +143,10 @@ function ProductModal({
 
         e.preventDefault();
 
+        if (savingRef.current) return;
+        savingRef.current = true;
+        setSaving(true);
+
         try {
 
             let productId;
@@ -239,6 +246,9 @@ function ProductModal({
                     : "Unable to Add Product"
 
             );
+
+            savingRef.current = false;
+            setSaving(false);
 
         }
 
@@ -455,6 +465,7 @@ function ProductModal({
                             multiple
                             accept="image/*"
                             onChange={handleImageChange}
+                            disabled={saving}
                         />
 
                     </div>
@@ -527,6 +538,7 @@ function ProductModal({
                             type="button"
                             className="cancel-btn"
                             onClick={closeModal}
+                            disabled={saving}
                         >
 
                             Cancel
@@ -536,15 +548,18 @@ function ProductModal({
                         <button
                             type="submit"
                             className="save-btn"
+                            disabled={saving}
                         >
 
                             {
 
-                                product
+                                saving
 
-                                    ? "Update Product"
+                                    ? "Saving..."
 
-                                    : "Save Product"
+                                    : product
+                                        ? "Update Product"
+                                        : "Save Product"
 
                             }
 

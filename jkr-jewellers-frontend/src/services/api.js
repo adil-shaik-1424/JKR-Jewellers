@@ -8,20 +8,29 @@ const PUBLIC_PREFIXES = ["/auth", "/products", "/categories", "/banners"];
 
 api.interceptors.request.use(
     (config) => {
-
         const token = localStorage.getItem("token");
-
         const isPublic = PUBLIC_PREFIXES.some((prefix) =>
             config.url.startsWith(prefix)
         );
-
         if (token && !isPublic) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-
         return config;
     },
     (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("email");
+            localStorage.removeItem("role");
+            window.location.href = "/login";
+        }
+        return Promise.reject(error);
+    }
 );
 
 export default api;

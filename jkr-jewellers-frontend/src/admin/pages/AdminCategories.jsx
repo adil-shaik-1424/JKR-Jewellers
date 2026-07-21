@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AdminLayout from "../components/AdminLayout";
 import CategoryModal from "../components/CategoryModal";
 import adminApi from "../services/adminApi";
@@ -11,6 +11,9 @@ function AdminCategories() {
     const [showModal, setShowModal] = useState(false);
 
     const [selectedCategory, setSelectedCategory] = useState(null);
+
+    const [deletingIds, setDeletingIds] = useState(new Set());
+    const deletingRef = useRef(new Set());
 
     const [popup, setPopup] = useState({
         open: false,
@@ -162,6 +165,8 @@ function AdminCategories() {
 
             showPopup("error", "Operation Failed");
 
+            throw error;
+
         }
 
     };
@@ -172,11 +177,16 @@ function AdminCategories() {
 
     const deleteCategory = async (id) => {
 
+        if (deletingRef.current.has(id)) return;
+
         const confirmDelete = window.confirm(
             "Are you sure you want to delete this category?"
         );
 
         if (!confirmDelete) return;
+
+        deletingRef.current.add(id);
+        setDeletingIds(new Set(deletingRef.current));
 
         try {
 
@@ -204,6 +214,13 @@ function AdminCategories() {
                 );
 
             }
+
+        }
+
+        finally {
+
+            deletingRef.current.delete(id);
+            setDeletingIds(new Set(deletingRef.current));
 
         }
 
@@ -305,6 +322,7 @@ function AdminCategories() {
 
                                                 <button
                                                     className="edit-btn"
+                                                    disabled={deletingIds.has(category.id)}
                                                     onClick={() => editCategory(category)}
                                                 >
                                                     Edit
@@ -312,9 +330,10 @@ function AdminCategories() {
 
                                                 <button
                                                     className="delete-btn"
+                                                    disabled={deletingIds.has(category.id)}
                                                     onClick={() => deleteCategory(category.id)}
                                                 >
-                                                    Delete
+                                                    {deletingIds.has(category.id) ? "Deleting..." : "Delete"}
                                                 </button>
 
                                             </td>

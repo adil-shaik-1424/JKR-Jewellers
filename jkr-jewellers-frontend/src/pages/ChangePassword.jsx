@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import api from "../services/api";
 
 import Header from "../components/Header/Header";
@@ -15,6 +15,9 @@ function ChangePassword() {
         confirmPassword: ""
     });
 
+    const [submitting, setSubmitting] = useState(false);
+    const submittingRef = useRef(false);
+
     const handleChange = (e) => {
 
         setForm({
@@ -25,6 +28,8 @@ function ChangePassword() {
     };
 
     const handleSubmit = async () => {
+
+        if (submittingRef.current) return;
 
         if (
             form.currentPassword.trim() === "" ||
@@ -45,6 +50,9 @@ function ChangePassword() {
             return;
 
         }
+
+        submittingRef.current = true;
+        setSubmitting(true);
 
         try {
 
@@ -72,6 +80,11 @@ function ChangePassword() {
         "Unable to change password.";
 
     alert(message);
+
+} finally {
+
+    submittingRef.current = false;
+    setSubmitting(false);
 
 }
 
@@ -114,8 +127,8 @@ function ChangePassword() {
                         onChange={handleChange}
                     />
 
-                    <button onClick={handleSubmit}>
-                        Update Password
+                    <button onClick={handleSubmit} disabled={submitting}>
+                        {submitting ? "Updating..." : "Update Password"}
                     </button>
 
                 </div>

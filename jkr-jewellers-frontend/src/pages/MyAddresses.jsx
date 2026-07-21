@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../services/api";
 
 import Header from "../components/Header/Header";
@@ -10,6 +10,11 @@ import "./MyAddresses.css";
 function MyAddresses() {
 
     const [addresses, setAddresses] = useState([]);
+    const [saving, setSaving] = useState(false);
+    const savingRef = useRef(false);
+
+    const [busyIds, setBusyIds] = useState(new Set());
+    const busyRef = useRef(new Set());
 
     const [popup, setPopup] = useState({
         open: false,
@@ -78,6 +83,10 @@ function MyAddresses() {
 
     const saveAddress = async () => {
 
+        if (savingRef.current) return;
+        savingRef.current = true;
+        setSaving(true);
+
         try {
 
             await api.post("/addresses", form);
@@ -93,7 +102,7 @@ function MyAddresses() {
                 phone: ""
             });
 
-            fetchAddresses();
+            await fetchAddresses();
 
         } catch (error) {
 
@@ -101,11 +110,21 @@ function MyAddresses() {
 
             showPopup("error", "Unable to add address.");
 
+        } finally {
+
+            savingRef.current = false;
+            setSaving(false);
+
         }
 
     };
 
     const deleteAddress = async (id) => {
+
+        if (busyRef.current.has(id)) return;
+
+        busyRef.current.add(id);
+        setBusyIds(new Set(busyRef.current));
 
         try {
 
@@ -113,7 +132,7 @@ function MyAddresses() {
 
             showPopup("success", "Address Deleted Successfully");
 
-            fetchAddresses();
+            await fetchAddresses();
 
         } catch (error) {
 
@@ -123,6 +142,11 @@ function MyAddresses() {
             showPopup("error", message);
 
             console.error(error);
+
+        } finally {
+
+            busyRef.current.delete(id);
+            setBusyIds(new Set(busyRef.current));
 
         }
 
@@ -192,8 +216,9 @@ function MyAddresses() {
                     <button
                         className="save-address-btn"
                         onClick={saveAddress}
+                        disabled={saving}
                     >
-                        Add Address
+                        {saving ? "Adding..." : "Add Address"}
                     </button>
 
                 </div>
@@ -233,8 +258,9 @@ function MyAddresses() {
                                     <button
                                         className="delete-address-btn"
                                         onClick={() => deleteAddress(address.id)}
+                                        disabled={busyIds.has(address.id)}
                                     >
-                                        Delete
+                                        {busyIds.has(address.id) ? "..." : "Delete"}
                                     </button>
 
                                 </div>

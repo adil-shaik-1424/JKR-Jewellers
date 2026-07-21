@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AdminLayout from "../components/AdminLayout";
 import adminApi from "../services/adminApi";
 import "../css/AdminBanners.css";
@@ -8,6 +8,9 @@ function AdminBanners() {
     const [banners, setBanners] = useState({});
 
     const [uploading, setUploading] = useState({});
+
+    const [deleting, setDeleting] = useState({});
+    const deletingRef = useRef({});
 
     const [popup, setPopup] = useState({
         open: false,
@@ -131,7 +134,12 @@ function AdminBanners() {
 
 const handleDelete = async (position) => {
 
+    if (deletingRef.current[position]) return;
+
     if (!window.confirm(`Delete Banner ${position}?`)) return;
+
+    deletingRef.current[position] = true;
+    setDeleting((prev) => ({ ...prev, [position]: true }));
 
     try {
 
@@ -154,6 +162,13 @@ const handleDelete = async (position) => {
             "error",
             "Unable to delete banner."
         );
+
+    }
+
+    finally {
+
+        deletingRef.current[position] = false;
+        setDeleting((prev) => ({ ...prev, [position]: false }));
 
     }
 
@@ -259,7 +274,7 @@ return (
                                     type="file"
                                     accept="image/*"
                                     hidden
-                                    disabled={uploading[position]}
+                                    disabled={uploading[position] || deleting[position]}
                                     onChange={(e) =>
                                         handleFileChange(position, e)
                                     }
@@ -273,12 +288,13 @@ return (
 
                                 <button
                                     className="delete-btn"
+                                    disabled={deleting[position]}
                                     onClick={() =>
                                         handleDelete(position)
                                     }
                                 >
 
-                                    Delete
+                                    {deleting[position] ? "Deleting..." : "Delete"}
 
                                 </button>
 

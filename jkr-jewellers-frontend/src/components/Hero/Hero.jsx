@@ -33,11 +33,7 @@ function Hero() {
     };
 
     if (banners.length === 0) {
-        return (
-            <section className="hero">
-                <img src="/banner1.jpg" alt="JKR Jewellers Banner" />
-            </section>
-        );
+        return null;
     }
 
     return (

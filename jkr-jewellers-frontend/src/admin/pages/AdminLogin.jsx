@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import "./../css/AdminLogin.css";
@@ -7,6 +7,9 @@ function AdminLogin() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const [submitting, setSubmitting] = useState(false);
+    const submittingRef = useRef(false);
 
     const [popup, setPopup] = useState({
         open: false,
@@ -38,6 +41,10 @@ function AdminLogin() {
     const handleLogin = async (e) => {
 
         e.preventDefault();
+
+        if (submittingRef.current) return;
+        submittingRef.current = true;
+        setSubmitting(true);
 
         try {
 
@@ -72,6 +79,13 @@ function AdminLogin() {
             console.error(error);
 
             showPopup("error", "Invalid Email or Password");
+
+        }
+
+        finally {
+
+            submittingRef.current = false;
+            setSubmitting(false);
 
         }
 
@@ -132,8 +146,9 @@ function AdminLogin() {
                     <button
                         type="submit"
                         className="login-btn"
+                        disabled={submitting}
                     >
-                        Login
+                        {submitting ? "Logging in..." : "Login"}
                     </button>
 
                 </form>

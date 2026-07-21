@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../services/api";
 
 import Header from "../components/Header/Header";
@@ -10,6 +10,8 @@ import "./Wishlist.css";
 function Wishlist() {
 
     const [wishlist, setWishlist] = useState([]);
+    const [busyItems, setBusyItems] = useState(new Set());
+    const busyRef = useRef(new Set());
 
     const [popup, setPopup] = useState({
         open: false,
@@ -58,13 +60,29 @@ function Wishlist() {
 
     };
 
-    const removeWishlist = async (productId) => {
+    const withItemLock = async (productId, fn) => {
+
+        if (busyRef.current.has(productId)) return;
+
+        busyRef.current.add(productId);
+        setBusyItems(new Set(busyRef.current));
+
+        try {
+            await fn();
+        } finally {
+            busyRef.current.delete(productId);
+            setBusyItems(new Set(busyRef.current));
+        }
+
+    };
+
+    const removeWishlist = (productId) => withItemLock(productId, async () => {
 
         try {
 
             await api.delete(`/wishlist/${productId}`);
 
-            fetchWishlist();
+            await fetchWishlist();
 
             showPopup("success", "Item removed from wishlist.");
 
@@ -76,9 +94,9 @@ function Wishlist() {
 
         }
 
-    };
+    });
 
-    const addToCart = async (productId) => {
+    const addToCart = (productId) => withItemLock(productId, async () => {
 
         try {
 
@@ -97,7 +115,7 @@ function Wishlist() {
 
         }
 
-    };
+    });
 
     return (
 
@@ -131,6 +149,7 @@ function Wishlist() {
                         {wishlist.map((item) => {
 
                             const isUnavailable = item.status !== "AVAILABLE";
+                            const isBusy = busyItems.has(item.productId);
 
                             return (
 
@@ -162,21 +181,22 @@ function Wishlist() {
 
                                     <button
                                         className="cart-btn"
-                                        disabled={isUnavailable}
+                                        disabled={isUnavailable || isBusy}
                                         onClick={() =>
                                             addToCart(item.productId)
                                         }
                                     >
-                                        {isUnavailable ? "Unavailable" : "Add To Cart"}
+                                        {isUnavailable ? "Unavailable" : (isBusy ? "..." : "Add To Cart")}
                                     </button>
 
                                     <button
                                         className="remove-btn"
+                                        disabled={isBusy}
                                         onClick={() =>
                                             removeWishlist(item.productId)
                                         }
                                     >
-                                        Remove
+                                        {isBusy ? "..." : "Remove"}
                                     </button>
 
                                 </div>

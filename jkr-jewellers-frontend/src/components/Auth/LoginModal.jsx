@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import "./Auth.css";
 import api from "../../services/api";
@@ -16,6 +16,8 @@ function LoginModal({ setIsLoggedIn }) {
 
   const [otp, setOtp] = useState("");
   const [resending, setResending] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   // Popup State
   const [popup, setPopup] = useState({
@@ -57,6 +59,10 @@ function LoginModal({ setIsLoggedIn }) {
 
     e.preventDefault();
 
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
+
     try {
 
       const response = await api.post("/auth/login", {
@@ -81,6 +87,11 @@ function LoginModal({ setIsLoggedIn }) {
 
       showPopup("error", message);
 
+    } finally {
+
+      submittingRef.current = false;
+      setSubmitting(false);
+
     }
 
   };
@@ -89,6 +100,8 @@ function LoginModal({ setIsLoggedIn }) {
 
     e.preventDefault();
 
+    if (submittingRef.current) return;
+
     if (password !== confirmPassword) {
 
       showPopup("error", "Passwords do not match");
@@ -96,6 +109,9 @@ function LoginModal({ setIsLoggedIn }) {
       return;
 
     }
+
+    submittingRef.current = true;
+    setSubmitting(true);
 
     try {
 
@@ -122,6 +138,11 @@ function LoginModal({ setIsLoggedIn }) {
 
       console.error(error);
 
+    } finally {
+
+      submittingRef.current = false;
+      setSubmitting(false);
+
     }
 
   };
@@ -129,6 +150,10 @@ function LoginModal({ setIsLoggedIn }) {
   const handleVerifyOtp = async (e) => {
 
     e.preventDefault();
+
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
 
     try {
 
@@ -156,10 +181,18 @@ function LoginModal({ setIsLoggedIn }) {
 
       console.error(error);
 
+    } finally {
+
+      submittingRef.current = false;
+      setSubmitting(false);
+
     }
 
   };
-    const handleResendOtp = async () => {
+
+  const handleResendOtp = async () => {
+
+    if (resending) return;
 
     setResending(true);
 
@@ -230,8 +263,8 @@ function LoginModal({ setIsLoggedIn }) {
                     required
                   />
 
-                  <button type="submit">
-                    Verify & Continue
+                  <button type="submit" disabled={submitting}>
+                    {submitting ? "Verifying..." : "Verify & Continue"}
                   </button>
 
                 </form>
@@ -322,10 +355,10 @@ function LoginModal({ setIsLoggedIn }) {
                     />
                   )}
 
-                  <button type="submit">
-                    {mode === "register"
-                      ? "Register"
-                      : "Login"}
+                  <button type="submit" disabled={submitting}>
+                    {submitting
+                      ? (mode === "register" ? "Registering..." : "Logging in...")
+                      : (mode === "register" ? "Register" : "Login")}
                   </button>
 
                 </form>

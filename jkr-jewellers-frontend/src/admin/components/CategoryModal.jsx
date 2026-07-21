@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "../css/CategoryModal.css";
 
 function CategoryModal({
@@ -20,6 +20,9 @@ function CategoryModal({
     const [image, setImage] = useState(null);
 
     const [featured, setFeatured] = useState(false);
+
+    const [saving, setSaving] = useState(false);
+    const savingRef = useRef(false);
 
     useEffect(() => {
 
@@ -46,20 +49,33 @@ function CategoryModal({
 
     }, [category]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
 
         e.preventDefault();
 
-        onSave({
+        if (savingRef.current) return;
+        savingRef.current = true;
+        setSaving(true);
 
-            name,
-            gender,
-            metalType,
-            description,
-            image,
-            featured
+        try {
 
-        });
+            await onSave({
+
+                name,
+                gender,
+                metalType,
+                description,
+                image,
+                featured
+
+            });
+
+        } finally {
+
+            savingRef.current = false;
+            setSaving(false);
+
+        }
 
     };
 
@@ -157,6 +173,7 @@ function CategoryModal({
                             type="file"
                             accept="image/*"
                             onChange={(e) => setImage(e.target.files[0])}
+                            disabled={saving}
                         />
 
                     </div>
@@ -183,6 +200,7 @@ function CategoryModal({
                             type="button"
                             className="cancel-btn"
                             onClick={closeModal}
+                            disabled={saving}
                         >
 
                             Cancel
@@ -192,11 +210,14 @@ function CategoryModal({
                         <button
                             type="submit"
                             className="save-btn"
+                            disabled={saving}
                         >
 
-                            {category
-                                ? "Update Category"
-                                : "Save Category"}
+                            {saving
+                                ? "Saving..."
+                                : category
+                                    ? "Update Category"
+                                    : "Save Category"}
 
                         </button>
 

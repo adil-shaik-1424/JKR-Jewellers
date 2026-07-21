@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
@@ -19,6 +19,10 @@ function Checkout() {
     const [cart, setCart] = useState(null);
     const [selectedAddress, setSelectedAddress] = useState("");
     const [processing, setProcessing] = useState(false);
+    const placingOrderRef = useRef(false);
+
+    const [savingAddress, setSavingAddress] = useState(false);
+    const savingAddressRef = useRef(false);
 
     const [popup, setPopup] = useState({
         show: false,
@@ -99,6 +103,10 @@ function Checkout() {
 
     const saveAddress = async () => {
 
+        if (savingAddressRef.current) return;
+        savingAddressRef.current = true;
+        setSavingAddress(true);
+
         try {
 
             await api.post("/addresses", newAddress);
@@ -109,7 +117,7 @@ function Checkout() {
                 message: "Address added successfully."
             });
 
-            fetchAddresses();
+            await fetchAddresses();
 
             setNewAddress({
                 addressLine1: "",
@@ -130,11 +138,37 @@ function Checkout() {
                 message: "Unable to save address."
             });
 
+        } finally {
+
+            savingAddressRef.current = false;
+            setSavingAddress(false);
+
         }
 
     };
 
+    const loadRazorpayScript = () => {
+
+        return new Promise((resolve) => {
+
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+
+        });
+
+    };
+
     const placeOrder = async () => {
+
+        if (placingOrderRef.current) return;
 
         if (!selectedAddress) {
 
@@ -148,9 +182,24 @@ function Checkout() {
 
         }
 
+        placingOrderRef.current = true;
         setProcessing(true);
 
         try {
+
+            const scriptLoaded = await loadRazorpayScript();
+
+            if (!scriptLoaded) {
+
+                setPopup({
+                    show: true,
+                    type: "error",
+                    message: "Unable to load payment gateway. Please check your connection."
+                });
+
+                return;
+
+            }
 
             const orderResponse = await api.post("/orders", {
                 addressId: selectedAddress
@@ -254,12 +303,14 @@ function Checkout() {
 
         } finally {
 
+            placingOrderRef.current = false;
             setProcessing(false);
 
         }
 
     };
-        if (!cart) {
+
+    if (!cart) {
 
         return <h2>Loading...</h2>;
 
@@ -358,8 +409,9 @@ function Checkout() {
                     <button
                         className="save-btn"
                         onClick={saveAddress}
+                        disabled={savingAddress}
                     >
-                        Save Address
+                        {savingAddress ? "Saving..." : "Save Address"}
                     </button>
 
                 </div>

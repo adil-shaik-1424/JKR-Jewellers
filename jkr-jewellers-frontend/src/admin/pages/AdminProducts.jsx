@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AdminLayout from "../components/AdminLayout";
 import ProductModal from "../components/ProductModal";
 import adminApi from "../services/adminApi";
@@ -11,6 +11,9 @@ function AdminProducts() {
     const [showModal, setShowModal] = useState(false);
 
     const [selectedProduct, setSelectedProduct] = useState(null);
+
+    const [deletingIds, setDeletingIds] = useState(new Set());
+    const deletingRef = useRef(new Set());
 
     const [popup, setPopup] = useState({
         open: false,
@@ -78,7 +81,10 @@ function AdminProducts() {
         setShowModal(true);
 
     };
-        const deleteProduct = async (id) => {
+
+    const deleteProduct = async (id) => {
+
+        if (deletingRef.current.has(id)) return;
 
         const confirmDelete = window.confirm(
             "Delete this product?"
@@ -89,6 +95,9 @@ function AdminProducts() {
             return;
 
         }
+
+        deletingRef.current.add(id);
+        setDeletingIds(new Set(deletingRef.current));
 
         try {
 
@@ -113,6 +122,13 @@ function AdminProducts() {
                 error.response?.data ||
                 "Unable to delete product."
             );
+
+        }
+
+        finally {
+
+            deletingRef.current.delete(id);
+            setDeletingIds(new Set(deletingRef.current));
 
         }
 
@@ -218,6 +234,8 @@ function AdminProducts() {
 
                                             className="edit-btn"
 
+                                            disabled={deletingIds.has(product.id)}
+
                                             onClick={() =>
                                                 editProduct(product)
                                             }
@@ -232,13 +250,15 @@ function AdminProducts() {
 
                                             className="delete-btn"
 
+                                            disabled={deletingIds.has(product.id)}
+
                                             onClick={() =>
                                                 deleteProduct(product.id)
                                             }
 
                                         >
 
-                                            Delete
+                                            {deletingIds.has(product.id) ? "Deleting..." : "Delete"}
 
                                         </button>
 

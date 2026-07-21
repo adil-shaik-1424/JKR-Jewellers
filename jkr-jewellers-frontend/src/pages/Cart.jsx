@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
@@ -13,6 +13,8 @@ function Cart() {
     const navigate = useNavigate();
 
     const [cart, setCart] = useState(null);
+    const [busyItems, setBusyItems] = useState(new Set());
+    const busyRef = useRef(new Set());
 
     const [popup, setPopup] = useState({
         open: false,
@@ -61,7 +63,23 @@ function Cart() {
 
     };
 
-    const increaseQuantity = async (item) => {
+    const withItemLock = async (cartItemId, fn) => {
+
+        if (busyRef.current.has(cartItemId)) return;
+
+        busyRef.current.add(cartItemId);
+        setBusyItems(new Set(busyRef.current));
+
+        try {
+            await fn();
+        } finally {
+            busyRef.current.delete(cartItemId);
+            setBusyItems(new Set(busyRef.current));
+        }
+
+    };
+
+    const increaseQuantity = (item) => withItemLock(item.cartItemId, async () => {
 
         try {
 
@@ -69,7 +87,7 @@ function Cart() {
                 `/cart/${item.cartItemId}?quantity=${item.quantity + 1}`
             );
 
-            fetchCart();
+            await fetchCart();
 
         } catch (error) {
 
@@ -79,15 +97,15 @@ function Cart() {
 
         }
 
-    };
+    });
 
-    const decreaseQuantity = async (item) => {
+    const decreaseQuantity = (item) => withItemLock(item.cartItemId, async () => {
 
         try {
 
             if (item.quantity === 1) {
 
-                await removeItem(item.cartItemId);
+                await removeItemInternal(item.cartItemId);
 
                 return;
 
@@ -97,7 +115,7 @@ function Cart() {
                 `/cart/${item.cartItemId}?quantity=${item.quantity - 1}`
             );
 
-            fetchCart();
+            await fetchCart();
 
         } catch (error) {
 
@@ -107,15 +125,15 @@ function Cart() {
 
         }
 
-    };
+    });
 
-    const removeItem = async (cartItemId) => {
+    const removeItemInternal = async (cartItemId) => {
 
         try {
 
             await api.delete(`/cart/${cartItemId}`);
 
-            fetchCart();
+            await fetchCart();
 
             showPopup("success", "Item removed from cart.");
 
@@ -128,6 +146,8 @@ function Cart() {
         }
 
     };
+
+    const removeItem = (cartItemId) => withItemLock(cartItemId, () => removeItemInternal(cartItemId));
 
     if (!cart) {
 
@@ -180,6 +200,7 @@ function Cart() {
                             {cart.items.map((item) => {
 
                                 const isUnavailable = item.status !== "AVAILABLE";
+                                const isBusy = busyItems.has(item.cartItemId);
 
                                 return (
 
@@ -216,7 +237,7 @@ function Cart() {
                                             <div className="quantity-box">
 
                                                 <button
-                                                    disabled={isUnavailable}
+                                                    disabled={isUnavailable || isBusy}
                                                     onClick={() => decreaseQuantity(item)}
                                                 >
                                                     −
@@ -225,7 +246,7 @@ function Cart() {
                                                 <span>{item.quantity}</span>
 
                                                 <button
-                                                    disabled={isUnavailable}
+                                                    disabled={isUnavailable || isBusy}
                                                     onClick={() => increaseQuantity(item)}
                                                 >
                                                     +
@@ -239,9 +260,10 @@ function Cart() {
 
                                             <button
                                                 className="remove-btn"
+                                                disabled={isBusy}
                                                 onClick={() => removeItem(item.cartItemId)}
                                             >
-                                                Remove
+                                                {isBusy ? "..." : "Remove"}
                                             </button>
 
                                         </div>
