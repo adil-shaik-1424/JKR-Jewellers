@@ -46,6 +46,14 @@ function App() {
             return;
         }
 
+        if (localStorage.getItem("sessionExpired")) {
+
+            localStorage.removeItem("sessionExpired");
+            setShowAuthPrompt(true);
+            return;
+
+        }
+
         const timer = setTimeout(() => {
             setShowAuthPrompt(true);
         }, 3000);

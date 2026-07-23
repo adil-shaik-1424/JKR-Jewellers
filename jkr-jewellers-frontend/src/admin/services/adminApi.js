@@ -38,6 +38,11 @@ adminApi.interceptors.response.use(
 
             window.location.href = "/admin/login";
 
+        } else if (!error.response) {
+
+            // network error / no response — tab idle for a long time, dropped connection, CORS, etc.
+            console.error("Admin API network error or no response:", error.message);
+
         }
 
         return Promise.reject(error);
