@@ -30,9 +30,9 @@
 
 .main-image {
 
-    width: 420px;
+    width: 540px;
 
-    height: 420px;
+    height: 540px;
 
     object-fit: contain;
 
@@ -217,9 +217,9 @@
 
         width: 100%;
 
-        max-width: 350px;
+        max-width: 450px;
 
-        height: 350px;
+        height: 450px;
     }
 
     .product-buttons {
@@ -247,7 +247,7 @@
 
     .main-image {
         max-width: 100%;
-        height: 260px;
+        height: 320px;
     }
 
     .thumbnail {
