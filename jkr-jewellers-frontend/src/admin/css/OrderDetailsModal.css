@@ -151,3 +151,22 @@
         font-size: 13px;
     }
 }
+
+.order-item-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.order-item-no-image {
+    font-size: 11px;
+    color: #999;
+}
+
+.order-item-id {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+}

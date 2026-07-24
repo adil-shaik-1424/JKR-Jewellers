@@ -219,6 +219,7 @@ function OrderDetailsModal({ orderId, closeModal, refreshOrders }) {
                                 <thead>
 
                                     <tr>
+                                        <th>Image</th>
                                         <th>Product</th>
                                         <th>Qty</th>
                                         <th>Price</th>
@@ -234,7 +235,22 @@ function OrderDetailsModal({ orderId, closeModal, refreshOrders }) {
 
                                             <tr key={index}>
 
-                                                <td>{item.productName}</td>
+                                                <td>
+                                                    {item.productImage ? (
+                                                        <img
+                                                            src={item.productImage}
+                                                            alt={item.productName}
+                                                            className="order-item-thumbnail"
+                                                        />
+                                                    ) : (
+                                                        <span className="order-item-no-image">No image</span>
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    {item.productName}
+                                                    <div className="order-item-id">ID: {item.productId}</div>
+                                                </td>
 
                                                 <td>{item.quantity}</td>
 
@@ -248,7 +264,7 @@ function OrderDetailsModal({ orderId, closeModal, refreshOrders }) {
 
                                         <tr>
 
-                                            <td colSpan="3">
+                                            <td colSpan="4">
 
                                                 No products found
 
