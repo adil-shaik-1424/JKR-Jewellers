@@ -6,6 +6,7 @@ public class OrderItemResponse {
 
     private Long productId;
     private String productName;
+    private String productImage;
     private Integer quantity;
     private BigDecimal priceAtPurchase;
 
@@ -14,6 +15,9 @@ public class OrderItemResponse {
 
     public String getProductName() { return productName; }
     public void setProductName(String productName) { this.productName = productName; }
+
+    public String getProductImage() { return productImage; }
+    public void setProductImage(String productImage) { this.productImage = productImage; }
 
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }

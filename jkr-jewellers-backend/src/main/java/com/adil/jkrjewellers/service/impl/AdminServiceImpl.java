@@ -246,6 +246,16 @@ public class AdminServiceImpl implements AdminService {
         response.setQuantity(orderItem.getQuantity());
         response.setPriceAtPurchase(orderItem.getPriceAtPurchase());
 
+        List<ProductImage> images = orderItem.getProduct().getImages();
+        if (images != null && !images.isEmpty()) {
+            String imageUrl = images.stream()
+                    .filter(ProductImage::isPrimary)
+                    .map(ProductImage::getImageUrl)
+                    .findFirst()
+                    .orElse(images.get(0).getImageUrl());
+            response.setProductImage(imageUrl);
+        }
+
         return response;
     }
 
