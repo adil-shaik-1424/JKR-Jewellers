@@ -14,6 +14,7 @@ function Products() {
 
     const categoryId = searchParams.get("categoryId");
     const keyword = searchParams.get("keyword");
+    const gender = searchParams.get("gender");
 
     const navigate = useNavigate();
 
@@ -25,16 +26,25 @@ function Products() {
             fetchProducts();
         }
 
-    }, [categoryId, keyword]);
+    }, [categoryId, keyword, gender]);
 
     const fetchProducts = async () => {
 
         try {
 
             let url = "/products";
+            const params = [];
 
             if (categoryId) {
-                url += `?categoryId=${categoryId}`;
+                params.push(`categoryId=${categoryId}`);
+            }
+
+            if (gender) {
+                params.push(`gender=${gender}`);
+            }
+
+            if (params.length > 0) {
+                url += `?${params.join("&")}`;
             }
 
             const response = await api.get(url);
