@@ -68,7 +68,9 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
             "http://localhost:5173",
-            "https://jkr-jewellers.vercel.app"
+            "https://jkr-jewellers.vercel.app",
+            "https://jkrjewellers.store",
+            "https://www.jkrjewellers.store"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
