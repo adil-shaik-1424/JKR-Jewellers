@@ -20,6 +20,8 @@ public interface ProductService {
 
     List<ProductResponse> getProductsByCategory(Long categoryId);
 
+    List<ProductResponse> getProductsByGender(String gender);
+
     List<ProductResponse> getBestSellers();
 
     List<ProductResponse> searchProducts(String keyword);

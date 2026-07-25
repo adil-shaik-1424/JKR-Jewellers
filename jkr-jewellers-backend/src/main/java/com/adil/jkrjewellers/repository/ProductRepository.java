@@ -33,6 +33,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             MetalType metalType
     );
 
+    // Products by Gender only
+    List<Product> findByCategoryGender(Gender gender);
+
     // Products by Gender, Metal & Category
     List<Product> findByCategoryGenderAndCategoryMetalTypeAndCategoryId(
             Gender gender,

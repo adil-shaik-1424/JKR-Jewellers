@@ -7,6 +7,7 @@ import com.adil.jkrjewellers.entity.Category;
 import com.adil.jkrjewellers.entity.Product;
 import com.adil.jkrjewellers.entity.ProductImage;
 import com.adil.jkrjewellers.entity.enums.ProductStatus;
+import com.adil.jkrjewellers.entity.enums.Gender;
 import com.adil.jkrjewellers.exception.ResourceNotFoundException;
 import com.adil.jkrjewellers.repository.CartItemRepository;
 import com.adil.jkrjewellers.repository.CategoryRepository;
@@ -134,6 +135,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getProductsByCategory(Long categoryId) {
         return mapToResponseList(productRepository.findByCategoryId(categoryId));
+    }
+
+    @Override
+    public List<ProductResponse> getProductsByGender(String gender) {
+        Gender genderEnum = Gender.valueOf(gender.toUpperCase());
+        return mapToResponseList(productRepository.findByCategoryGender(genderEnum));
     }
 
     @Override

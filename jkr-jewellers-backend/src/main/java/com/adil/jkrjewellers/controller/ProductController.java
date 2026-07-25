@@ -20,10 +20,15 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts(
-            @RequestParam(required = false) Long categoryId) {
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String gender) {
 
         if (categoryId != null) {
             return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
+        }
+
+        if (gender != null) {
+            return ResponseEntity.ok(productService.getProductsByGender(gender));
         }
 
         return ResponseEntity.ok(productService.getAllProducts());
